@@ -1,0 +1,98 @@
+version: '3'
+
+services:
+  backend:
+    build:
+      context: ./backend-api
+    ports:
+      - 4000:4000 # Only for dev. Delete later
+    env_file:
+      - '.env'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # Binding the docker socket, so we can create containers 
+      - ./datasets:/app/datasets      
+      - volume-results:/app/results       
+    restart: unless-stopped
+    networks:
+      - my-network
+
+  mongoDB: #rename
+    image: mongo:latest
+    ports:
+      - 27017:27017
+    volumes:
+      - serviceDB-config:/data/configdb
+      - serviceDB-data:/data/db
+    restart: unless-stopped
+    networks:
+      - my-network
+
+  proxy:
+    build: proxy
+    env_file:
+      - '.env'
+    ports:
+      - 8001:80
+    volumes:
+      - ./proxy/httpd.conf:/usr/local/apache2/conf/httpd.conf
+      - ./client/dist:/usr/local/apache2/htdocs # Frontend
+      - ./proxy/public:/usr/local/apache2/htdocs/public
+    restart: unless-stopped
+    networks:
+      - my-network    
+
+  contractservice:
+    build:
+      context: ./contract-service
+    env_file:
+      - '.env'
+    ports:
+      - '8002:3000'
+    restart: unless-stopped
+    networks:
+      - my-network    
+
+  contractDB:
+    image: docker.io/mongo
+    env_file:
+      - '.env'
+    ports:
+      - 27018:27017
+    volumes:
+      - contractDB-data:/data/db
+      - contractDB-config:/data/configdb
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    restart: unless-stopped
+    networks:
+      - my-network    
+
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:21.0.0
+    env_file:
+      - .env
+    ports:
+      - 8080:8080
+    volumes:
+      - keycloak-data:/opt/keycloak/data
+      - ./realm.json:/opt/keycloak/data/import/realm.json:ro
+    restart: unless-stopped
+    command:
+      [
+        "start-dev",
+        "--import-realm"
+      ]
+
+
+volumes:
+  volume-results:
+  datasets:
+  serviceDB-data:
+  serviceDB-config:
+  contractDB-data:
+  contractDB-config:
+  keycloak-data:
+
+networks:
+  my-network:
+    driver: bridge  

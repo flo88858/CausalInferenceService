@@ -1,0 +1,112 @@
+openapi: 3.0.3
+info:
+  title: GAIA-X-Med Contract Service
+  description: Service for storing and managing GAIA-X-Med contracts. Will eventually also handle contract negotiation. Built with express.js and MongoDB.
+  version: 0.0.0
+servers:
+  - url: 'https://localhost:3000'
+paths:
+  /contracts:
+    get:
+      summary: Fetches a contract for a given Consumer and Service
+      parameters:
+        - in: query
+          name: participant
+          description: Consumer's unique Participant identifier (DID ID), URL-encoded
+          schema:
+            type: string
+            example: "identity.consumer.com%3Ajohndoe"
+          required: true
+        - in: query
+          name: service
+          description: Service's unique identifier (DID ID), URL-encoded
+          schema:
+            type: string
+            example: "identity.provider.com%3Aservices%3Agallery"
+          required: true
+      responses:
+        200:
+          description: Contract exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contract'
+        404:
+          description: No contract found for the given Consumer and Service
+
+    put:
+      summary: Create a new contract for the given Consumer and Service. This is a temporary means of quickly adding a new contract for testing.
+      parameters:
+        - in: query
+          name: participant
+          description: Consumer's unique Participant identifier (DID ID), URL-encoded
+          schema:
+            type: string
+            example: "identity.consumer.com%3Ajohndoe"
+          required: true
+        - in: query
+          name: service
+          description: Service's unique identifier (DID ID), URL-encoded
+          schema:
+            type: string
+            example: "identity.provider.com%3Aservices%3Agallery"
+          required: true
+        - in: query
+          name: validFrom
+          description: UNIX timestamp that marks the beginning of the contract's validity. If not supplied, will use the current time.
+          schema:
+            type: number
+            example: 1690460452
+          required: false
+        - in: query
+          name: validUntil
+          description: UNIX timestamp that marks the beginning of the contract's validity. If not supplied, will use the value of validFrom plus 365 days.
+          schema:
+            type: number
+            example: 1721996452
+          required: false
+          
+      responses:
+        204:
+          description: Contract created
+
+components:
+  securitySchemes:
+    GAIA-X-Med-Identity:
+      type: apiKey
+      in: header
+      name: gaia-x-identity
+      description: Participant Identity information from the Authentication Proxy, as base64-encoded JSON.
+    GAIA-X-Med-Contract:
+      type: apiKey
+      in: header
+      name: gaia-x-contract
+      description: Contract information for the Participant and the Service from the Authentication Proxy, as base64-encoded JSON.
+
+  schemas:
+    Contract:
+      type: object
+      properties:
+        participant:
+          type: string
+          description: A Participant's unique identifier (DID ID)
+          example: "identity.consumer.com:johndoe"
+        service:
+          type: string
+          description: A Service's unique identifier (DID ID)
+          example: "identity.provider.com:services:gallery"
+        data:
+          $ref: '#/components/schemas/ContractData'
+    
+    ContractData:
+      type: object
+      properties:
+        validFrom:
+          type: number
+          description: UNIX timestamp that marks the beginning of the contract's validitiy
+          example: 1690460452
+        validUntil:
+          type: number
+          description: UNIX timestamp that marks the end of the contract's validitiy
+          example: 1721996452
+

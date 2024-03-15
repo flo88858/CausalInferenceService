@@ -1,0 +1,31 @@
+version: "3"
+services:
+
+  contract-service:
+    container_name: contractService
+    build: .
+    ports:
+      - "3000:3000"
+    env_file:
+      - '.env'
+    links:
+      - contractDB
+    restart: always
+
+  contractDB:
+    container_name: contractDB
+    image: docker.io/mongo
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: contracts
+    env_file:
+      - '.env'
+    volumes:
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - data:/data/db
+
+volumes:
+  data:

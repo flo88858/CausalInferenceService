@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="container">
+        <div id="card">
+            <h1>Logout successful.</h1>
+            <a href="/">Login</a>
+        </div>
+    </div>
+</body>
+</html>
+
+<style>
+    body {
+            width: 100vw;
+            height: 100vh;
+            margin: 0; 
+            padding: 0; 
+            overflow: hidden; /* Prevent scrolling */
+            background: linear-gradient(to bottom right, #9f1239, #3730a3);
+            color: white;
+    }
+    #container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+    }
+
+    h1{
+        padding: 0;
+        margin: 0;
+    }
+
+    #card {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        background: #1f2937;
+        color: #e5e7eb;
+        padding: 2.5em;
+        border-radius: 0.5rem;
+        box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        font-family: 'font-sans', sans-serif; 
+    }
+    a {
+        margin-top: 1.5rem;
+        text-decoration: none;
+        background-color: #1d4ed8;
+        color: #e5e7eb;
+        border-radius: 0.25rem;
+        padding-top: 0.75rem; 
+        padding-bottom: 0.75rem; 
+        width: 100%;
+        font-weight: 600;
+
+    }
+    a:hover{
+        background-color:  #1e40af
+    }
+</style>
